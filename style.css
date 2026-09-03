@@ -23,6 +23,14 @@
   --btn-bg: #7aa2f7;
   --btn-color: #0f0f17;
   --btn-hover-bg: #9bbdff;
+  --energy-track: #22223a;
+  --energy-from: #7aa2f7;
+  --energy-to: #b39ddb;
+  --energy-full: #ffd54f;
+  --energy-text: #e0e0e0;
+  --card-bg: #1a1a25;
+  --card-border: #2a2a3a;
+  --card-hover-bg: #22223a;
 }
 
 [data-theme="light"] {
@@ -44,6 +52,14 @@
   --btn-bg: #3b5bdb;
   --btn-color: #ffffff;
   --btn-hover-bg: #5c7ce8;
+  --energy-track: #e8e8f0;
+  --energy-from: #3b5bdb;
+  --energy-to: #7e57c2;
+  --energy-full: #f9a825;
+  --energy-text: #1a1a25;
+  --card-bg: #ffffff;
+  --card-border: #c7c7d9;
+  --card-hover-bg: #e8e8f0;
 }
 
 body {
@@ -159,12 +175,192 @@ body {
   letter-spacing: 1px;
 }
 
-#next-canvas {
+#next-canvas,
+#hold-canvas {
   display: block;
   border: 1px solid var(--board-border);
   background: var(--board-bg);
   border-radius: 4px;
   transition: background 0.2s, border-color 0.2s;
+}
+
+/* ---- Energía y habilidades ---- */
+.energy-bar {
+  position: relative;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--energy-track);
+  border: 1px solid var(--kbd-border);
+  overflow: hidden;
+}
+
+.energy-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--energy-from), var(--energy-to));
+  transition: width 0.25s ease-out;
+}
+
+.energy-bar.full .energy-fill {
+  background: var(--energy-full);
+  animation: energy-pulse 1s ease-in-out infinite;
+}
+
+@keyframes energy-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.energy-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--energy-text);
+  text-shadow: 0 0 3px var(--energy-track);
+  pointer-events: none;
+}
+
+.ability-btn {
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.ability-btn kbd {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+  font-weight: 700;
+}
+
+.ability-btn:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+}
+
+.ability-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 18px;
+}
+
+.effect-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  color: var(--value-color);
+}
+
+.ability-box {
+  width: min(420px, 92%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  text-align: center;
+}
+
+.ability-heading {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--value-color);
+}
+
+.ability-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ability-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ability-card:hover:not(:disabled),
+.ability-card:focus-visible {
+  background: var(--card-hover-bg);
+  border-color: var(--value-color);
+  outline: none;
+}
+
+.ability-card:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ability-key {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--kbd-color);
+}
+
+.ability-icon {
+  flex: none;
+  font-size: 18px;
+}
+
+.ability-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ability-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--value-color);
+}
+
+.ability-desc {
+  font-size: 11px;
+  color: var(--controls-color);
+}
+
+.ability-hint {
+  font-size: 11px;
+  color: var(--controls-color);
 }
 
 /* ---- Controles ---- */

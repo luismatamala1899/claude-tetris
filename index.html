@@ -31,8 +31,23 @@
         </div>
 
         <div class="panel-section">
+          <span class="label">ENERGÍA</span>
+          <div class="energy-bar">
+            <div class="energy-fill" id="energy-fill"></div>
+            <span class="energy-text" id="energy-text">0%</span>
+          </div>
+          <button id="ability-btn" class="ability-btn" disabled>USAR <kbd>E</kbd></button>
+          <div class="effects" id="effects"></div>
+        </div>
+
+        <div class="panel-section">
           <span class="label">NEXT</span>
           <canvas id="next-canvas" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">HOLD</span>
+          <canvas id="hold-canvas" width="120" height="120"></canvas>
         </div>
 
         <div class="panel-section controls">
@@ -43,9 +58,18 @@
             <li><kbd>↓</kbd> bajar</li>
             <li><kbd>Space</kbd> caída</li>
             <li><kbd>P</kbd> pausa</li>
+            <li><kbd>E</kbd> habilidad</li>
           </ul>
         </div>
       </aside>
+    </div>
+
+    <div id="ability-overlay" class="overlay hidden">
+      <div class="ability-box">
+        <p class="ability-heading">ELIGE UNA HABILIDAD</p>
+        <div class="ability-list" id="ability-list"></div>
+        <p class="ability-hint"><kbd>1</kbd>–<kbd>5</kbd> elegir · <kbd>Esc</kbd> cancelar</p>
+      </div>
     </div>
 
     <div id="overlay" class="overlay hidden">
