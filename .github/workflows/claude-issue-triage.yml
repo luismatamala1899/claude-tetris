@@ -1,0 +1,63 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Issue Triage
+        id: claude-triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            You are triaging GitHub issue #${{ github.event.issue.number }} ("${{ github.event.issue.title }}")
+            in the repository ${{ github.repository }}. This is a vanilla JS/HTML5-Canvas Tetris game
+            (see CLAUDE.md for architecture: index.html, style.css, game.js).
+
+            Do the following:
+
+            1. Read the full issue with:
+               gh issue view ${{ github.event.issue.number }} --json title,body,labels,comments
+            2. List the labels that already exist in this repository with:
+               gh label list
+               Only ever use labels that already exist — never invent or create new labels.
+            3. Decide which existing labels best fit this issue (e.g. bug, enhancement, question,
+               documentation, duplicate, wontfix, or any project-specific labels you find). Base the
+               classification on the actual content of the issue, not just the title.
+            4. Update the issue's labels to match your classification:
+               gh issue edit ${{ github.event.issue.number }} --add-label "<label1>,<label2>"
+               If existing labels on the issue are clearly wrong given an edit, remove them with
+               --remove-label instead of leaving stale labels in place.
+            5. Look for an existing triage comment you posted previously by searching issue comments
+               for the marker "<!-- claude-issue-triage -->":
+               gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments
+               - If one exists, update it in place with:
+                 gh api -X PATCH repos/${{ github.repository }}/issues/comments/<comment_id> -f body=@<file>
+               - If none exists, create a new one with:
+                 gh issue comment ${{ github.event.issue.number }} --body-file <file>
+               In both cases the comment body must start with the "<!-- claude-issue-triage -->" marker
+               line, followed by a concise, technical general diagnosis of the problem: what is likely
+               happening, which files/functions in game.js, index.html, or style.css are probably
+               involved, and any relevant mechanics from CLAUDE.md (board/collision/rotation/scoring/etc.)
+               that are relevant context for whoever writes the fix. Do NOT write or propose the actual
+               code fix — this comment is diagnosis only, to prepare for a follow-up implementation task.
+
+            Keep the comment focused and skimmable (short paragraphs and/or bullet points).
+          claude_args: |
+            --allowedTools "Bash(gh issue view:*),Bash(gh label list:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh api:*)"
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://code.claude.com/docs/en/cli-reference for available options
