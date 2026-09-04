@@ -61,6 +61,16 @@
             <li><kbd>E</kbd> habilidad</li>
           </ul>
         </div>
+
+        <div class="panel-section">
+          <span class="label">RÉCORDS</span>
+          <ol id="leaderboard-list" class="leaderboard-list"></ol>
+          <div class="best-stats">
+            <span>Mejor combo: <strong id="best-combo">0</strong></span>
+            <span>Mejor líneas: <strong id="best-lines">0</strong></span>
+          </div>
+          <button id="reset-scores-btn" class="reset-btn">Reiniciar récords</button>
+        </div>
       </aside>
     </div>
 
@@ -76,6 +86,11 @@
       <div class="overlay-box">
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
+        <div id="save-score-form" class="save-score-form hidden">
+          <input type="text" id="player-name-input" maxlength="12" placeholder="Tu nombre" />
+          <button id="save-score-btn">Guardar</button>
+        </div>
+        <ol id="overlay-leaderboard-list" class="leaderboard-list"></ol>
         <button id="restart-btn">Reiniciar</button>
       </div>
     </div>
