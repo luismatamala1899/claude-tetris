@@ -57,7 +57,7 @@
             <li><kbd>↑</kbd> rotar</li>
             <li><kbd>↓</kbd> bajar</li>
             <li><kbd>Space</kbd> caída</li>
-            <li><kbd>P</kbd> pausa</li>
+            <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
             <li><kbd>E</kbd> habilidad</li>
           </ul>
         </div>
@@ -69,6 +69,41 @@
         <p class="ability-heading">ELIGE UNA HABILIDAD</p>
         <div class="ability-list" id="ability-list"></div>
         <p class="ability-hint"><kbd>1</kbd>–<kbd>5</kbd> elegir · <kbd>Esc</kbd> cancelar</p>
+      </div>
+    </div>
+
+    <div id="pause-overlay" class="overlay hidden">
+      <div class="pause-box">
+        <div id="pause-main-panel" class="pause-panel">
+          <p class="pause-heading">PAUSA</p>
+          <button id="resume-btn" class="ability-btn pause-btn">Reanudar</button>
+          <button id="pause-restart-btn" class="ability-btn pause-btn">Reiniciar</button>
+          <button id="show-controls-btn" class="ability-btn pause-btn">Ver controles</button>
+          <label class="pause-level-label" for="start-level-select">Nivel inicial</label>
+          <select id="start-level-select" class="pause-select">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+        <div id="pause-controls-panel" class="pause-panel hidden">
+          <p class="pause-heading">CONTROLES</p>
+          <ul class="pause-controls-list">
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↑</kbd> rotar</li>
+            <li><kbd>↓</kbd> bajar</li>
+            <li><kbd>Space</kbd> caída</li>
+            <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
+            <li><kbd>E</kbd> habilidad</li>
+          </ul>
+          <button id="controls-back-btn" class="ability-btn pause-btn">Volver</button>
+        </div>
       </div>
     </div>
 
