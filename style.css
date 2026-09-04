@@ -363,6 +363,76 @@ body {
   color: var(--controls-color);
 }
 
+/* ---- Menú de pausa ---- */
+.pause-box {
+  width: min(320px, 92%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  text-align: center;
+}
+
+.pause-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.pause-panel.hidden {
+  display: none;
+}
+
+.pause-heading {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--value-color);
+  margin-bottom: 4px;
+}
+
+.pause-btn {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.pause-level-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--label-color);
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.pause-select {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pause-controls-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.pause-controls-list li {
+  font-size: 13px;
+  color: var(--controls-color);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ---- Controles ---- */
 .controls ul {
   list-style: none;

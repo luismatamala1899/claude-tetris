@@ -34,6 +34,7 @@ const LINE_SCORES = [0, 100, 300, 500, 800];
 
 const THEME_KEY = 'tetris-theme';
 const GRID_COLORS = { dark: '#22222e', light: '#d5d5e2' };
+const START_LEVEL_KEY = 'tetris-start-level';
 
 // ---- Sistema de habilidades ----
 const QUEUE_SIZE = 5;            // piezas precalculadas en la cola
@@ -98,9 +99,18 @@ const abilityBtn = document.getElementById('ability-btn');
 const abilityOverlay = document.getElementById('ability-overlay');
 const abilityList = document.getElementById('ability-list');
 const effectsEl = document.getElementById('effects');
+const pauseOverlay = document.getElementById('pause-overlay');
+const pauseMainPanel = document.getElementById('pause-main-panel');
+const pauseControlsPanel = document.getElementById('pause-controls-panel');
+const resumeBtn = document.getElementById('resume-btn');
+const pauseRestartBtn = document.getElementById('pause-restart-btn');
+const showControlsBtn = document.getElementById('show-controls-btn');
+const controlsBackBtn = document.getElementById('controls-back-btn');
+const startLevelSelect = document.getElementById('start-level-select');
 
 let board, current, queue, hold, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let energy, choosing, slowLeft, visionLeft, snapshot, effectsHTML;
+let startLevel;
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -503,18 +513,27 @@ function endGame() {
   updateEnergyUI();
 }
 
+function openPauseMenu() {
+  pauseMainPanel.classList.remove('hidden');
+  pauseControlsPanel.classList.add('hidden');
+  startLevelSelect.value = String(startLevel);
+  pauseOverlay.classList.remove('hidden');
+}
+
+function closePauseMenu() {
+  pauseOverlay.classList.add('hidden');
+}
+
 function togglePause() {
   if (gameOver || choosing) return;
   paused = !paused;
   if (!paused) {
-    overlay.classList.add('hidden');
+    closePauseMenu();
     lastTime = performance.now();
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
-    overlayTitle.textContent = 'PAUSA';
-    overlayScore.textContent = '';
-    overlay.classList.remove('hidden');
+    openPauseMenu();
   }
   updateEnergyUI();
 }
@@ -541,10 +560,10 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  level = startLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = Math.max(100, 1000 - (startLevel - 1) * 90);
   dropAccum = 0;
   lastTime = performance.now();
   energy = 0;
@@ -562,6 +581,7 @@ function init() {
   drawHold();
   overlay.classList.add('hidden');
   abilityOverlay.classList.add('hidden');
+  pauseOverlay.classList.add('hidden');
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
@@ -573,7 +593,7 @@ document.addEventListener('keydown', e => {
     if (slot >= 0 && slot < ABILITIES.length) chooseAbility(ABILITIES[slot].id);
     return;
   }
-  if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
   if (paused || gameOver) return;
   if (e.code === 'KeyE') { openAbilityMenu(); return; }
   switch (e.code) {
@@ -604,6 +624,35 @@ abilityOverlay.addEventListener('click', e => {
   if (e.target === abilityOverlay) closeAbilityMenu();
 });
 
+resumeBtn.addEventListener('click', () => {
+  if (paused) togglePause();
+});
+
+pauseRestartBtn.addEventListener('click', () => {
+  closePauseMenu();
+  paused = false;
+  init();
+});
+
+showControlsBtn.addEventListener('click', () => {
+  pauseMainPanel.classList.add('hidden');
+  pauseControlsPanel.classList.remove('hidden');
+});
+
+controlsBackBtn.addEventListener('click', () => {
+  pauseControlsPanel.classList.add('hidden');
+  pauseMainPanel.classList.remove('hidden');
+});
+
+startLevelSelect.addEventListener('change', () => {
+  startLevel = parseInt(startLevelSelect.value, 10);
+  localStorage.setItem(START_LEVEL_KEY, String(startLevel));
+});
+
+pauseOverlay.addEventListener('click', e => {
+  if (e.target === pauseOverlay && paused) togglePause();
+});
+
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   themeToggle.checked = theme === 'light';
@@ -620,5 +669,11 @@ themeToggle.addEventListener('change', () => {
   applyTheme(theme);
 });
 
+function initStartLevel() {
+  const saved = parseInt(localStorage.getItem(START_LEVEL_KEY), 10);
+  startLevel = (saved >= 1 && saved <= 9) ? saved : 1;
+}
+
 initTheme();
+initStartLevel();
 init();
