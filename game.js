@@ -112,6 +112,10 @@ let board, current, queue, hold, score, lines, level, paused, gameOver, lastTime
 let energy, choosing, slowLeft, visionLeft, snapshot, effectsHTML;
 let startLevel;
 
+function dropIntervalForLevel(lvl) {
+  return Math.max(100, 1000 - (lvl - 1) * 90);
+}
+
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
 }
@@ -187,8 +191,8 @@ function clearLines() {
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
-    level = Math.floor(lines / 10) + 1;
-    dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    level = startLevel + Math.floor(lines / 10);
+    dropInterval = dropIntervalForLevel(level);
     gainEnergy(cleared * ENERGY_PER_LINE + (cleared >= 4 ? ENERGY_TETRIS_BONUS : 0));
     updateHUD();
   }
@@ -563,7 +567,7 @@ function init() {
   level = startLevel;
   paused = false;
   gameOver = false;
-  dropInterval = Math.max(100, 1000 - (startLevel - 1) * 90);
+  dropInterval = dropIntervalForLevel(startLevel);
   dropAccum = 0;
   lastTime = performance.now();
   energy = 0;
@@ -593,7 +597,7 @@ document.addEventListener('keydown', e => {
     if (slot >= 0 && slot < ABILITIES.length) chooseAbility(ABILITIES[slot].id);
     return;
   }
-  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
+  if ((e.code === 'KeyP' || e.code === 'Escape') && e.target !== startLevelSelect) { togglePause(); return; }
   if (paused || gameOver) return;
   if (e.code === 'KeyE') { openAbilityMenu(); return; }
   switch (e.code) {
@@ -646,7 +650,11 @@ controlsBackBtn.addEventListener('click', () => {
 
 startLevelSelect.addEventListener('change', () => {
   startLevel = parseInt(startLevelSelect.value, 10);
-  localStorage.setItem(START_LEVEL_KEY, String(startLevel));
+  try {
+    localStorage.setItem(START_LEVEL_KEY, String(startLevel));
+  } catch (err) {
+    // localStorage puede no estar disponible; el nivel elegido sigue activo en memoria.
+  }
 });
 
 pauseOverlay.addEventListener('click', e => {
@@ -670,7 +678,12 @@ themeToggle.addEventListener('change', () => {
 });
 
 function initStartLevel() {
-  const saved = parseInt(localStorage.getItem(START_LEVEL_KEY), 10);
+  let saved = NaN;
+  try {
+    saved = parseInt(localStorage.getItem(START_LEVEL_KEY), 10);
+  } catch (err) {
+    // localStorage puede no estar disponible (file://, almacenamiento bloqueado, etc.)
+  }
   startLevel = (saved >= 1 && saved <= 9) ? saved : 1;
 }
 
