@@ -363,6 +363,148 @@ body {
   color: var(--controls-color);
 }
 
+/* ---- Tabla de récords ---- */
+.leaderboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.leaderboard-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  font-size: 11px;
+}
+
+.leaderboard-list li.highlight {
+  background: var(--energy-full);
+  border-color: var(--energy-full);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.leaderboard-list li.lb-empty {
+  justify-content: center;
+  color: var(--controls-color);
+  font-style: italic;
+}
+
+.lb-rank {
+  flex: none;
+  width: 14px;
+  color: var(--label-color);
+  font-weight: 700;
+}
+
+.leaderboard-list li.highlight .lb-rank {
+  color: var(--bg);
+}
+
+.lb-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.leaderboard-list li.highlight .lb-name {
+  color: var(--bg);
+}
+
+.lb-score {
+  flex: none;
+  color: var(--value-color);
+  font-weight: 700;
+}
+
+.leaderboard-list li.highlight .lb-score {
+  color: var(--bg);
+}
+
+.best-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--controls-color);
+}
+
+.best-stats strong {
+  color: var(--value-color);
+}
+
+.reset-btn {
+  background: transparent;
+  color: var(--controls-color);
+  border: 1px solid var(--kbd-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.reset-btn:hover {
+  background: var(--kbd-bg);
+  color: var(--text);
+  border-color: var(--value-color);
+}
+
+.save-score-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.save-score-form.hidden {
+  display: none;
+}
+
+#player-name-input {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text);
+  width: 140px;
+}
+
+#player-name-input:focus {
+  outline: none;
+  border-color: var(--value-color);
+}
+
+#save-score-btn {
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#save-score-btn:hover {
+  background: var(--btn-hover-bg);
+}
+
+#overlay-leaderboard-list {
+  width: min(240px, 90%);
+}
+
 /* ---- Controles ---- */
 .controls ul {
   list-style: none;
