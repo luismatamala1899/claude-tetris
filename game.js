@@ -35,6 +35,39 @@ const LINE_SCORES = [0, 100, 300, 500, 800];
 const THEME_KEY = 'tetris-theme';
 const GRID_COLORS = { dark: '#22222e', light: '#d5d5e2' };
 
+// ---- Sistema de skins ----
+// IMPORTANTE: cada paleta debe tener la misma longitud y orden que COLORS
+// (índice = tipo de pieza). Si se agrega una pieza nueva a PIECES/COLORS,
+// añade también su color a 'neon' y 'pastel' aquí; drawBlock() cae de vuelta
+// a COLORS[colorIndex] para índices faltantes, pero eso ignora el skin activo.
+const SKIN_KEY = 'tetris-skin';
+const SKIN_PALETTES = {
+  retro: COLORS,
+  neon: [
+    null,
+    '#00fff2', // I - cian neón
+    '#faff00', // O - amarillo neón
+    '#ff00ff', // T - magenta neón
+    '#39ff14', // S - verde lima eléctrico
+    '#ff073a', // Z - rojo neón
+    '#00aaff', // J - azul neón
+    '#ff9100', // L - naranja neón
+    '#e0e0e0', // N - plateado
+  ],
+  pastel: [
+    null,
+    '#b2ebf2', // I - celeste pastel
+    '#fff9c4', // O - amarillo pastel
+    '#e1bee7', // T - lila pastel
+    '#c8e6c9', // S - verde pastel
+    '#ffcdd2', // Z - rosa pastel
+    '#bbdefb', // J - azul pastel
+    '#ffe0b2', // L - naranja pastel
+    '#eceff1', // N - gris pastel
+  ],
+  pixel: COLORS,
+};
+
 // ---- Sistema de habilidades ----
 const QUEUE_SIZE = 5;            // piezas precalculadas en la cola
 const ENERGY_MAX = 100;
@@ -91,6 +124,7 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggle = document.getElementById('theme-toggle');
+const skinSelect = document.getElementById('skin-select');
 const energyBar = document.querySelector('.energy-bar');
 const energyFill = document.getElementById('energy-fill');
 const energyText = document.getElementById('energy-text');
@@ -101,6 +135,7 @@ const effectsEl = document.getElementById('effects');
 
 let board, current, queue, hold, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let energy, choosing, slowLeft, visionLeft, snapshot, effectsHTML;
+let currentSkin = 'retro';
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -231,14 +266,94 @@ function updateHUD() {
 
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const palette = SKIN_PALETTES[currentSkin] || COLORS;
+  const color = palette[colorIndex] || COLORS[colorIndex];
   context.globalAlpha = alpha ?? 1;
+  switch (currentSkin) {
+    case 'neon':
+      drawBlockNeon(context, x, y, color, size);
+      break;
+    case 'pastel':
+      drawBlockPastel(context, x, y, color, size);
+      break;
+    case 'pixel':
+      drawBlockPixel(context, x, y, color, size);
+      break;
+    default:
+      drawBlockRetro(context, x, y, color, size);
+  }
+  context.globalAlpha = 1;
+}
+
+function drawBlockRetro(context, x, y, color, size) {
   context.fillStyle = color;
   context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
   // highlight
   context.fillStyle = 'rgba(255,255,255,0.12)';
   context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
-  context.globalAlpha = 1;
+}
+
+function drawBlockNeon(context, x, y, color, size) {
+  context.shadowBlur = Math.max(6, size * 0.4);
+  context.shadowColor = color;
+  context.fillStyle = color;
+  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+  context.shadowBlur = 0;
+  context.shadowColor = 'transparent';
+  // highlight
+  context.fillStyle = 'rgba(255,255,255,0.2)';
+  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+}
+
+function drawBlockPastel(context, x, y, color, size) {
+  const px = x * size + 1;
+  const py = y * size + 1;
+  const w = size - 2;
+  const h = size - 2;
+  const radius = Math.min(6, w / 3, h / 3);
+  context.fillStyle = color;
+  drawRoundedRectPath(context, px, py, w, h, radius);
+  context.fill();
+  // highlight
+  context.fillStyle = 'rgba(255,255,255,0.3)';
+  drawRoundedRectPath(context, px, py, w, Math.max(3, h * 0.35), radius);
+  context.fill();
+}
+
+function drawRoundedRectPath(context, x, y, w, h, radius) {
+  // Igual que el clamp interno de CanvasRenderingContext2D.roundRect: el radio
+  // nunca puede superar la mitad del lado más corto o el path se distorsiona.
+  radius = Math.max(0, Math.min(radius, w / 2, h / 2));
+  context.beginPath();
+  if (typeof context.roundRect === 'function') {
+    context.roundRect(x, y, w, h, radius);
+    return;
+  }
+  // Fallback manual para navegadores sin roundRect.
+  context.moveTo(x + radius, y);
+  context.arcTo(x + w, y, x + w, y + h, radius);
+  context.arcTo(x + w, y + h, x, y + h, radius);
+  context.arcTo(x, y + h, x, y, radius);
+  context.arcTo(x, y, x + w, y, radius);
+  context.closePath();
+}
+
+function drawBlockPixel(context, x, y, color, size) {
+  const px = x * size + 1;
+  const py = y * size + 1;
+  const w = size - 2;
+  const h = size - 2;
+  context.fillStyle = color;
+  context.fillRect(px, py, w, h);
+  // textura pixel-art: grilla 2x2 alternando tonos claros/oscuros
+  const halfW = w / 2;
+  const halfH = h / 2;
+  context.fillStyle = 'rgba(0,0,0,0.15)';
+  context.fillRect(px, py, halfW, halfH);
+  context.fillRect(px + halfW, py + halfH, w - halfW, h - halfH);
+  context.fillStyle = 'rgba(255,255,255,0.18)';
+  context.fillRect(px + halfW, py, w - halfW, halfH);
+  context.fillRect(px, py + halfH, halfW, h - halfH);
 }
 
 function drawGrid() {
@@ -620,5 +735,27 @@ themeToggle.addEventListener('change', () => {
   applyTheme(theme);
 });
 
+function applySkin(skin) {
+  currentSkin = SKIN_PALETTES[skin] ? skin : 'retro';
+  localStorage.setItem(SKIN_KEY, currentSkin);
+  document.documentElement.setAttribute('data-skin', currentSkin);
+  skinSelect.value = currentSkin;
+  draw();
+  drawPreview();
+  drawHold();
+}
+
+function initSkin() {
+  const saved = localStorage.getItem(SKIN_KEY);
+  currentSkin = SKIN_PALETTES[saved] ? saved : 'retro';
+  document.documentElement.setAttribute('data-skin', currentSkin);
+  skinSelect.value = currentSkin;
+}
+
+skinSelect.addEventListener('change', () => {
+  applySkin(skinSelect.value);
+});
+
 initTheme();
+initSkin();
 init();
